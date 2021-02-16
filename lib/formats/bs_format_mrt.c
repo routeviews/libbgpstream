@@ -249,9 +249,13 @@ static int handle_bgp4mp(rec_data_t *rd, parsebgp_mrt_msg_t *mrt)
     break;
 
   case PARSEBGP_MRT_BGP4MP_MESSAGE:
+  case PARSEBGP_MRT_BGP4MP_MESSAGE_ADDPATH:
   case PARSEBGP_MRT_BGP4MP_MESSAGE_AS4:
+  case PARSEBGP_MRT_BGP4MP_MESSAGE_AS4_ADDPATH:
   case PARSEBGP_MRT_BGP4MP_MESSAGE_LOCAL:
+  case PARSEBGP_MRT_BGP4MP_MESSAGE_LOCAL_ADDPATH:
   case PARSEBGP_MRT_BGP4MP_MESSAGE_AS4_LOCAL:
+  case PARSEBGP_MRT_BGP4MP_MESSAGE_AS4_LOCAL_ADDPATH:
     rc = bgpstream_parsebgp_process_update(&rd->upd_state, rd->elem,
                                            bgp4mp->data.bgp_msg);
     if (rc == 0) {
