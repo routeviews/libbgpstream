@@ -64,6 +64,9 @@ typedef struct state {
 
 } state_t;
 
+//local variable for signaling addpath state to opts.bgp
+int addpath;
+
 static int handle_update(rec_data_t *rd, parsebgp_bgp_msg_t *bgp)
 {
   int rc;
@@ -158,6 +161,7 @@ static int is_wanted_time(uint32_t record_time,
 
 #define IS_ROUTER_MSG (flags & 0x80)
 #define IS_ROUTER_IPV6 (flags & 0x40)
+#define IS_PEER_ADDPATH (flags & 0x20)
 
 static int populate_prep_cb(bgpstream_format_t *format, uint8_t *buf,
                             size_t *lenp, bgpstream_record_t *record)
@@ -227,6 +231,13 @@ static int populate_prep_cb(bgpstream_format_t *format, uint8_t *buf,
   if (!IS_ROUTER_MSG) {
     // we only care about bmp raw messages, which are always router messages
     return 0;
+  }
+
+  if (IS_PEER_ADDPATH) {
+    //signal addpath encoding
+    addpath = 1;
+  } else {
+    addpath = 0;
   }
 
   // check the object type
@@ -384,6 +395,8 @@ bgpstream_format_status_t
 bs_format_bmp_populate_record(bgpstream_format_t *format,
                               bgpstream_record_t *record)
 {
+  //set addpath val before calling popualte_rec
+  STATE->decoder.parser_opts.bgp.add_path = addpath;
   bgpstream_format_status_t rc = bgpstream_parsebgp_populate_record(
     &STATE->decoder, RDATA->msg, format, record, populate_prep_cb,
     populate_filter_cb);
